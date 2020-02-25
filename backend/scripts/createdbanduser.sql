@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS flights;
+GRANT ALL ON *.* TO 'flightsapp' IDENTIFIED BY 'topsecret';
+FLUSH PRIVILEGES;
