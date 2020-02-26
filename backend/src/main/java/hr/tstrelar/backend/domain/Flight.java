@@ -30,7 +30,7 @@ public class Flight {
     @Column (name = "NUMBER_OF_TRANSFERS", length = 2)
     private int numberOfTransfers;
 
-    @Column (name = "NUMBER_OF_PASSANGERS", length = 10)
+    @Column (name = "NUMBER_OF_PASSENGERS", length = 10)
     private int numberOfPassengers;
 
     @ManyToOne

@@ -21,7 +21,7 @@
             <column name="ARRIVAL_AIRPORT" type="VARCHAR(5)"/>
             <column name="DATE_DEPARTURE" type="datetime"/>
             <column name="DEPARTURE_AIRPORT" type="VARCHAR(5)"/>
-            <column name="NUMBER_OF_PASSANGERS" type="INT"/>
+            <column name="NUMBER_OF_PASSENGERS" type="INT"/>
             <column name="NUMBER_OF_TRANSFERS" type="INT"/>
             <column name="DATE_RETURN" type="datetime"/>
             <column name="COMPANY_ID" type="BIGINT">
