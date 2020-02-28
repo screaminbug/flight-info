@@ -6,6 +6,7 @@ import hr.tstrelar.flight.frontend.model.FlightSingleResponse;
 import hr.tstrelar.flight.frontend.restapi.FlightApi;
 import hr.tstrelar.flight.frontend.service.FlightService;
 import hr.tstrelar.flight.model.FlightDto;
+import hr.tstrelar.flight.model.FlightMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class FlightController implements FlightApi {
     }
 
 //    @Override
-//    public DeferredResult<ResponseEntity<List<FlightDto>>> findFlight(
+//    public DeferredResult<ResponseEntity<List<FlightMessage>>> findFlight(
 //            @NotNull @Valid List<String> departureDate,
 //            @NotNull @Valid List<String> arrivalDate,
 //            @Valid List<String> departure,
@@ -73,6 +74,7 @@ public class FlightController implements FlightApi {
                 company,
                 null
         );
+
         return DeferredFlightServiceResult.Builder.create(timeout, FlightListResponse.class)
                 .withRequest(flightDto).build()
                 .callWith(jmsFlightService::searchFlights);

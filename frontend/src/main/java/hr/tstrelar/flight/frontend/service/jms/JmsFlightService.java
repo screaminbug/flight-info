@@ -7,6 +7,7 @@ import hr.tstrelar.flight.frontend.model.FlightResponse;
 import hr.tstrelar.flight.frontend.model.FlightSingleResponse;
 import hr.tstrelar.flight.frontend.service.FlightService;
 import hr.tstrelar.flight.model.FlightDto;
+import hr.tstrelar.flight.model.FlightMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Service
 public class JmsFlightService implements FlightService {
 
-    private final SyncRequestor<FlightDto> syncRequestor;
+    private final SyncRequestor<FlightMessage> syncRequestor;
 
     @Value("${flight.save.queue}")
     private String flightSaveQueue;
@@ -27,18 +28,22 @@ public class JmsFlightService implements FlightService {
     private Integer timeout;
 
     @Autowired
-    public JmsFlightService(SyncRequestor<FlightDto> syncRequestor) {
+    public JmsFlightService(SyncRequestor<FlightMessage> syncRequestor) {
         this.syncRequestor = syncRequestor;
     }
 
     @Override
     public FlightSingleResponse persistFlightData(FlightDto flight) throws FlightServiceException {
         FlightSingleResponse response = new FlightSingleResponse();
-        response.setRequestId(UUID.randomUUID().toString());
+        UUID uuid = UUID.randomUUID();
+        response.setRequestId(uuid.toString());
+        FlightMessage flightMessage = new FlightMessage();
+        flightMessage.setFlightDto(flight);
+        flightMessage.setMessageId(uuid);
         try {
             syncRequestor.setTimeout(timeout);
             syncRequestor.setCorrelationId(response.getRequestId());
-            Message message = syncRequestor.requestAndWait(flight, flightSaveQueue);
+            Message message = syncRequestor.requestAndWait(flightMessage, flightSaveQueue);
             if (message != null) {
                 // if we timed out, message will bi null, but request id will still be set
                 // this is near-realtime processing

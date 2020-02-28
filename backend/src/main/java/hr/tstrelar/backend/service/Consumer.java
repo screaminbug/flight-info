@@ -6,6 +6,7 @@ import hr.tstrelar.backend.mapper.FlightMapper;
 import hr.tstrelar.backend.repository.CompanyRepository;
 import hr.tstrelar.backend.repository.FlightRepository;
 import hr.tstrelar.flight.model.FlightDto;
+import hr.tstrelar.flight.model.FlightMessage;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -31,17 +32,21 @@ public class Consumer {
     }
 
     @JmsListener(destination = "flight.save.queue.request")
-    public FlightDto receiveMessage(final Message<FlightDto> message) throws InterruptedException {
-        FlightDto flightDto = message.getPayload();
+    public FlightDto receiveMessage(final Message<FlightMessage> message) throws InterruptedException {
+        FlightMessage flightMessage = message.getPayload();
+        FlightDto flightDto = flightMessage.getFlightDto();
         Company company = companyRepository.findFirstByName(flightDto.getCompany());
         if (company == null) {
             company = new Company();
             company.setName(flightDto.getCompany());
             company = companyRepository.save(company);
         }
-        Flight flight = flightMapper.flightDtoToFlight(message.getPayload());
+        Flight flight = flightMapper.flightDtoToFlight(flightDto);
         flight.setCompany(company);
+        flight.setId(flightMessage.getMessageId());
         flight = flightRepository.save(flight);
-        return flightMapper.flightToFlightDto(flight);
+        FlightDto response = flightMapper.flightToFlightDto(flight);
+        response.setCompany(company.getName());
+        return response;
     }
 }
