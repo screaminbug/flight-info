@@ -33,4 +33,7 @@
         <addForeignKeyConstraint baseColumnNames="COMPANY_ID" baseTableName="FLIGHTINFO_FLIGHTS" constraintName="FK_s2my7xm3frd94yvigvy5xu96k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="FLIGHTINFO_COMPANIES"/>
     </changeSet>
 
+    <changeSet author="Tomislav (generated)" id="1582844791886-1">
+        <dropColumn columnName="DATE_RETURN" tableName="flightinfo_flights"/>
+    </changeSet>
 </databaseChangeLog>

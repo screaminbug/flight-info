@@ -21,9 +21,6 @@ public class Flight {
     @Column (name = "ARRIVAL_AIRPORT", length = 5)
     private String arrivalAirport;
 
-    @Column (name = "DATE_RETURN")
-    private Date returnDate;
-
     @Column (name = "DATE_DEPARTURE")
     private Date dateDeparture;
 

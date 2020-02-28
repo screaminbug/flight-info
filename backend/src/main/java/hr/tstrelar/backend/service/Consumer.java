@@ -32,9 +32,13 @@ public class Consumer {
 
     @JmsListener(destination = "flight.save.queue.request")
     public FlightDto receiveMessage(final Message<FlightDto> message) throws InterruptedException {
-        Company company = new Company();
-        company.setName("SomeCompany");
-        company = companyRepository.save(company);
+        FlightDto flightDto = message.getPayload();
+        Company company = companyRepository.findFirstByName(flightDto.getCompany());
+        if (company == null) {
+            company = new Company();
+            company.setName(flightDto.getCompany());
+            company = companyRepository.save(company);
+        }
         Flight flight = flightMapper.flightDtoToFlight(message.getPayload());
         flight.setCompany(company);
         flight = flightRepository.save(flight);

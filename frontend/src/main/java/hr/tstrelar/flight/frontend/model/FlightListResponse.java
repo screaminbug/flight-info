@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FlightListResponse {
-    private String requestId;
-    private List<FlightDto> flightDto;
+public class FlightListResponse extends FlightResponse{
+    private List<FlightDto> flightDtos;
 }

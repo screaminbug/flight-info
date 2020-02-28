@@ -4,11 +4,18 @@ import hr.tstrelar.backend.domain.Flight;
 import hr.tstrelar.flight.model.FlightDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface FlightMapper {
-    @Mapping(ignore = true, target = "company", source = "company")
+    @Mappings({
+        @Mapping(target = "company", ignore = true)
+    })
     Flight flightDtoToFlight(FlightDto flightDto);
-    @Mapping(ignore = true, target = "company", source = "company")
+
+    @Mappings({
+        @Mapping(target = "company", ignore = true)
+    })
+    @Mapping(ignore = true, target = "company")
     FlightDto flightToFlightDto(Flight flight);
 }
