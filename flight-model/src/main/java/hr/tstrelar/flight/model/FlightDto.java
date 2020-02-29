@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class FlightDto implements Serializable {
+  private UUID id;
   private String departureAirport;
   private String arrivalAirport;
   @JsonFormat(shape = JsonFormat.Shape.STRING)

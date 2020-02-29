@@ -14,8 +14,7 @@ public interface FlightMapper {
     Flight flightDtoToFlight(FlightDto flightDto);
 
     @Mappings({
-        @Mapping(target = "company", ignore = true)
+        @Mapping(target = "company", source = "company.name")
     })
-    @Mapping(ignore = true, target = "company")
     FlightDto flightToFlightDto(Flight flight);
 }

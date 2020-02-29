@@ -1,9 +1,7 @@
 package hr.tstrelar.flight.frontend.restapi;
 
-import hr.tstrelar.flight.frontend.model.FlightListResponse;
-import hr.tstrelar.flight.frontend.model.FlightResponse;
-import hr.tstrelar.flight.frontend.model.FlightSingleResponse;
 import hr.tstrelar.flight.model.FlightDto;
+import hr.tstrelar.flight.model.FlightMessage;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +10,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 @Api(value = "flight")
 public interface FlightApi {
@@ -30,7 +27,7 @@ public interface FlightApi {
     @PostMapping(value = "/flight",
         produces = { "application/json" }, 
         consumes = { "application/json" })
-    DeferredResult<ResponseEntity<FlightSingleResponse>> addFlight(@ApiParam(value = "A flight information that needs to be added to the repo", required = true) @Valid @RequestBody FlightDto body);
+    DeferredResult<ResponseEntity<FlightMessage>> addFlight(@ApiParam(value = "A flight information that needs to be added to the repo", required = true) @Valid @RequestBody FlightDto body);
 
 
 //    @ApiOperation(value = "Finds flights by departure and arrival locations, departure and arrival dates, number of transfers in outbound and inbound directions, number of passengers, currency, price and operating company", nickname = "findFlight", notes = "Multiple status values can be provided with comma separated strings", response = FlightDto.class, responseContainer = "List", authorizations = {
@@ -55,7 +52,7 @@ public interface FlightApi {
             @ApiResponse(code = 200, message = "successful operation", response = FlightDto.class, responseContainer = "List"),
             @ApiResponse(code = 400, message = "Invalid status value") })
     @GetMapping(value = "/flight/find", produces = { "application/json" })
-    DeferredResult<ResponseEntity<FlightListResponse>> findFlight(
+    DeferredResult<ResponseEntity<FlightMessage>> findFlight(
             @NotNull @ApiParam(value = "The date and time of the departure", required = true)
             @Valid @RequestParam(value = "departure-date", required = true)
                     Date departureDate,
@@ -91,7 +88,7 @@ public interface FlightApi {
         @ApiResponse(code = 404, message = "Pet not found") })
     @GetMapping(value = "/flight/{flightId}",
         produces = { "application/json" })
-    ResponseEntity<FlightSingleResponse> getFlightById(@ApiParam(value = "ID of flight to return", required = true) @PathVariable("flightId") Long flightId);
+    DeferredResult<ResponseEntity<FlightMessage>> getFlightById(@ApiParam(value = "ID of flight to return", required = true) @PathVariable("flightId") String flightId);
 
     @ApiOperation(value = "Update an existing flight", nickname = "updateFlight", notes = "", authorizations = {
         @Authorization(value = "flightinfo_auth", scopes = {
@@ -106,6 +103,6 @@ public interface FlightApi {
     @PutMapping(value = "/flight",
         produces = { "application/json" },
         consumes = { "application/json" })
-    ResponseEntity<FlightSingleResponse> updateFlight(@ApiParam(value = "Flight object that needs to be updated", required = true) @Valid @RequestBody FlightDto body);
+    ResponseEntity<FlightMessage> updateFlight(@ApiParam(value = "Flight object that needs to be updated", required = true) @Valid @RequestBody FlightDto body);
 
 }
