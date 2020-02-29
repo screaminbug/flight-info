@@ -62,13 +62,13 @@ public class SyncRequestor<T extends Serializable> {
                         destinationResolver.resolveDestinationName(
                                 session,
                                 destination + REQUEST_SUFFIX,
-                                true
+                                false
                         );
                 final Destination replyDestination =
                         destinationResolver.resolveDestinationName(
                                 session,
                                 destination + RESPONSE_SUFFIX,
-                                true);
+                                false);
 
                 consumer = session.createConsumer(replyDestination, CorrelationSelector.select(correlationId));
 

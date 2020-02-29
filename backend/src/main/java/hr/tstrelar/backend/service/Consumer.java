@@ -6,17 +6,14 @@ import hr.tstrelar.backend.mapper.FlightMapper;
 import hr.tstrelar.backend.repository.CompanyRepository;
 import hr.tstrelar.backend.repository.FlightRepository;
 import hr.tstrelar.flight.model.FlightDto;
-import hr.tstrelar.flight.model.FlightMessage;
-import hr.tstrelar.flight.model.Status;
-import hr.tstrelar.flight.model.StatusCode;
+import hr.tstrelar.flight.model.RequestMessage;
+import hr.tstrelar.flight.model.ResponseMessage;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import java.security.MessageDigest;
-import java.util.List;
 import java.util.UUID;
 
 import static hr.tstrelar.flight.model.Status.aStatusOf;
@@ -30,6 +27,8 @@ public class Consumer {
     private final CompanyRepository companyRepository;
     private final FlightMapper flightMapper;
 
+    private final String DEST_SUFFIX = ".request";
+
     @Autowired
     public Consumer(
             FlightRepository flightRepository,
@@ -40,10 +39,10 @@ public class Consumer {
         this.flightMapper = flightMapper;
     }
 
-    @JmsListener(destination = "flight.save.queue.request")
-    public FlightMessage persistFlightData(final Message<FlightMessage> message) {
-        FlightMessage flightMessage = message.getPayload();
-        FlightDto flightDto = flightMessage.getFlight();
+    @JmsListener(destination = "flight.queue.save.request")
+    public ResponseMessage persistFlightData(final Message<RequestMessage> message) {
+        RequestMessage requestMessage = message.getPayload();
+        FlightDto flightDto = requestMessage.getFlightDto();
         //TODO: Implement flight id and return error if that id already exists
         Company company = companyRepository.findFirstByName(flightDto.getCompany());
         if (company == null) {
@@ -53,16 +52,16 @@ public class Consumer {
         }
         Flight flight = flightMapper.flightDtoToFlight(flightDto);
         flight.setCompany(company);
-        flight.setId(flightMessage.getMessageId());
+        flight.setId(requestMessage.getMessageId());
         flightRepository.save(flight);
-        return new FlightMessage(flightMessage.getMessageId(), aStatusOf(SAVED), flightMapper.flightToFlightDto(flight));
+        return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(SAVED), flightMapper.flightToFlightDto(flight));
     }
 
-    @JmsListener(destination = "flight.get.queue.request")
-    public FlightMessage searchFlights(final Message<FlightMessage> message) {
+    @JmsListener(destination = "flight.queue.get.request")
+    public ResponseMessage searchFlights(final Message<RequestMessage> message) {
         UUID messageId = message.getPayload().getMessageId();
         return flightRepository.findById(messageId)
-                .map($ -> new FlightMessage(messageId, aStatusOf(OK), flightMapper.flightToFlightDto($)))
-                .orElse(new FlightMessage(messageId, aStatusOf(NOT_FOUND)));
+                .map($ -> new ResponseMessage(messageId, aStatusOf(OK), flightMapper.flightToFlightDto($)))
+                .orElse(new ResponseMessage(messageId, aStatusOf(NOT_FOUND)));
     }
 }

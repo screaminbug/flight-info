@@ -2,8 +2,9 @@ package hr.tstrelar.flight.frontend.controller;
 
 import hr.tstrelar.flight.frontend.restapi.FlightApi;
 import hr.tstrelar.flight.frontend.service.FlightService;
+import hr.tstrelar.flight.frontend.service.jms.DeferredFlightServiceResult;
 import hr.tstrelar.flight.model.FlightDto;
-import hr.tstrelar.flight.model.FlightMessage;
+import hr.tstrelar.flight.model.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +32,11 @@ public class FlightController implements FlightApi {
     }
 
     @Override
-    public DeferredResult<ResponseEntity<FlightMessage>> addFlight(@Valid FlightDto body) {
+    public DeferredResult<ResponseEntity<ResponseMessage>> addFlight(@Valid FlightDto flightDto) {
         // TODO: validate request
         return DeferredFlightServiceResult.Builder.create()
                 .withTimeout(timeout + 100)
-                .withRequest(body).build()
+                .withRequest(flightDto).build()
                 .callWith(jmsFlightService::persistFlightData);
     }
 
@@ -52,7 +53,7 @@ public class FlightController implements FlightApi {
 //    }
 
     @Override
-    public DeferredResult<ResponseEntity<FlightMessage>> findFlight(
+    public DeferredResult<ResponseEntity<ResponseMessage>> findFlight(
             @NotNull @Valid Date departureDate,
             @NotNull @Valid Date arrivalDate,
             @Valid String departure,
@@ -80,14 +81,16 @@ public class FlightController implements FlightApi {
     }
 
     @Override
-    public DeferredResult<ResponseEntity<FlightMessage>> getFlightById(String flightId) {
-        FlightDto flightDto = new FlightDto(UUID.fromString(flightId), null, null, null, null, null, null, null);
-        return DeferredFlightServiceResult.Builder.create().withTimeout(timeout+100).withRequest(flightDto)
-                .build().callWith(jmsFlightService::getSingleFlight);
+    public DeferredResult<ResponseEntity<ResponseMessage>> getFlightById(String flightId) {
+        return DeferredFlightServiceResult.Builder
+                .create()
+                .withTimeout(timeout+100)
+                .withRequest(UUID.fromString(flightId))
+                .build().callWith(jmsFlightService::getPreviousResponseOrFlight);
     }
 
     @Override
-    public ResponseEntity<FlightMessage> updateFlight(@Valid FlightDto body) {
+    public ResponseEntity<ResponseMessage> updateFlight(@Valid FlightDto body) {
         return null;
     }
 
