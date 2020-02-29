@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface FlightMapper {
     @Mappings({
@@ -17,4 +19,6 @@ public interface FlightMapper {
         @Mapping(target = "company", source = "company.name")
     })
     FlightDto flightToFlightDto(Flight flight);
+
+    List<FlightDto> flightsToFlightDtos(List<Flight> flights);
 }

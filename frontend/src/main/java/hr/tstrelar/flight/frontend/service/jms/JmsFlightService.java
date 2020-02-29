@@ -34,10 +34,10 @@ public class JmsFlightService implements FlightService {
     @Value("${flight.queue.get}")
     private String requestGetQueue;
 
-    @Value("${flight.queue.search")
+    @Value("${flight.queue.search}")
     private String requestSearchQueue;
 
-    @Value("${flight.queue.update")
+    @Value("${flight.queue.update}")
     private String requestUpdateQueue;
 
     @Value("${jms.sync.timeout}")
@@ -77,6 +77,7 @@ public class JmsFlightService implements FlightService {
 
     @Override
     public ResponseMessage searchFlights(RequestMessage message) {
+        message.setMessageId(UUID.randomUUID());
         return push(message, requestSearchQueue);
     }
 

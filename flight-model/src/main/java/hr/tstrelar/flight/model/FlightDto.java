@@ -13,14 +13,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FlightDto implements Serializable {
-  private UUID id;
-  private String departureAirport;
-  private String arrivalAirport;
-  @JsonFormat(shape = JsonFormat.Shape.STRING)
-  private Date dateDeparture;
-  private Integer numberOfTransfers;
-  private Integer numberOfPassengers;
-  private String company;
-  private Long flightId;
+    private String company;
+    private UUID id;
+    private String airportDeparture;
+    private String airportArrival;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Date dateArrival;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Date dateDeparture;
+    private Integer numberOfTransfers;
+    private Integer numberOfPassengers;
+    private String flightId;
 }
 

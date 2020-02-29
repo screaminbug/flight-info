@@ -16,13 +16,14 @@ create table if not exists flightinfo_flights
 (
     id binary(16) not null
         primary key,
-    arrival_airport varchar(5) null,
-    date_departure datetime null,
-    departure_airport varchar(5) null,
     flight_id varchar(15) null,
+    date_departure datetime null,
+    date_arrival datetime null,
+    airport_departure varchar(3) null,
+    airport_arrival varchar(3) null,
     number_of_passengers int null,
     number_of_transfers int null,
-    company_id bigint not null
+    company_id varchar(10) not null
 )
     engine=MyISAM;
 

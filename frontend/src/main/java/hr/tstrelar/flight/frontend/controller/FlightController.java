@@ -1,25 +1,24 @@
 package hr.tstrelar.flight.frontend.controller;
 
-import hr.tstrelar.flight.frontend.restapi.FlightApi;
 import hr.tstrelar.flight.frontend.service.FlightService;
 import hr.tstrelar.flight.frontend.service.jms.DeferredFlightServiceResult;
 import hr.tstrelar.flight.model.FlightDto;
 import hr.tstrelar.flight.model.ResponseMessage;
+import hr.tstrelar.flight.model.SearchDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "v1")
-public class FlightController implements FlightApi {
+public class FlightController  {
 
     @Value("${jms.sync.timeout}")
     private Long timeout;
@@ -31,8 +30,9 @@ public class FlightController implements FlightApi {
         this.jmsFlightService = jmsFlightService;
     }
 
-    @Override
-    public DeferredResult<ResponseEntity<ResponseMessage>> addFlight(@Valid FlightDto flightDto) {
+    @PostMapping(path = "flight", produces = "application/json", consumes = "application/json")
+    public DeferredResult<ResponseEntity<ResponseMessage>> addFlight(
+            @RequestBody FlightDto flightDto) {
         // TODO: validate request
         return DeferredFlightServiceResult.Builder.create()
                 .withTimeout(timeout + 100)
@@ -40,59 +40,57 @@ public class FlightController implements FlightApi {
                 .callWith(jmsFlightService::persistFlightData);
     }
 
-//    @Override
-//    public DeferredResult<ResponseEntity<List<FlightMessage>>> findFlight(
-//            @NotNull @Valid List<String> departureDate,
-//            @NotNull @Valid List<String> arrivalDate,
-//            @Valid List<String> departure,
-//            @Valid List<String> arrival,
-//            @Valid List<Integer> transfers,
-//            @Valid List<Integer> numberOfPassengers,
-//            @Valid List<String> company) {
-//        return null;
-//    }
+    @PostMapping(path = "flight/{id}", produces = "application/json", consumes = "application/json")
+    public DeferredResult<ResponseEntity<ResponseMessage>> updateFlight(
+            @RequestBody FlightDto body,
+            @PathVariable String id) {
+        return DeferredFlightServiceResult.Builder.create()
+                .withTimeout(timeout + 100)
+                .withRequest(body, UUID.fromString(id))
+                .build()
+                .callWith(jmsFlightService::updateFlightData);
+    }
 
-    @Override
+    @GetMapping(path = "flight/find", produces = "application/json")
     public DeferredResult<ResponseEntity<ResponseMessage>> findFlight(
-            @NotNull @Valid Date departureDate,
-            @NotNull @Valid Date arrivalDate,
-            @Valid String departure,
-            @Valid String arrival,
-            @Valid Integer transfers,
-            @Valid Integer numberOfPassengers,
-            @Valid String company) {
+            @RequestParam("date-dpt-from") @Nullable Date dateDepartureFrom,
+            @RequestParam("date-dpt-to") @Nullable Date dateDepartureTo,
+            @RequestParam("date-arr-from") @Nullable Date dateArrivalFrom,
+            @RequestParam("date-arr-to") @Nullable Date dateArrivalTo,
+            @RequestParam("departure-iata") @Nullable List<String> departureAirports,
+            @RequestParam("arrival-iata") @Nullable List<String> arrivalAirports,
+            @RequestParam("passanger-count") @Nullable List<Integer> numberOfPassengers,
+            @RequestParam("trasfers-count") @Nullable List<Integer> transfers,
+            @RequestParam("company") @Nullable List<String> companies,
+            @RequestParam("flight-id") @Nullable List<String> flightIds) {
         // TODO: add validation
-        FlightDto flightDto = new FlightDto(
-                null,
-                departure,
-                arrival,
-                departureDate,
-                transfers,
+        SearchDto searchDto = new SearchDto(
+                dateDepartureFrom,
+                dateDepartureTo,
+                dateArrivalFrom,
+                dateArrivalTo,
+                departureAirports,
+                arrivalAirports,
                 numberOfPassengers,
-                company,
-                null
+                transfers,
+                companies,
+                flightIds
         );
 
         return DeferredFlightServiceResult.Builder.create()
                 .withTimeout(timeout + 100)
-                .withRequest(flightDto)
+                .withRequest(searchDto)
                 .build()
                 .callWith(jmsFlightService::searchFlights);
     }
 
-    @Override
-    public DeferredResult<ResponseEntity<ResponseMessage>> getFlightById(String flightId) {
+    @GetMapping(value = "resource/{id}", produces = "application/json")
+    public DeferredResult<ResponseEntity<ResponseMessage>> getResultByMessageId(
+            @PathVariable("id") String messageId) {
         return DeferredFlightServiceResult.Builder
                 .create()
                 .withTimeout(timeout+100)
-                .withRequest(UUID.fromString(flightId))
+                .withRequest(UUID.fromString(messageId))
                 .build().callWith(jmsFlightService::getPreviousResponseOrFlight);
     }
-
-    @Override
-    public ResponseEntity<ResponseMessage> updateFlight(@Valid FlightDto body) {
-        return null;
-    }
-
-
 }
