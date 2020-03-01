@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class FlightSearchRepositoryImpl implements FlightSearchRepository {
@@ -23,10 +24,11 @@ public class FlightSearchRepositoryImpl implements FlightSearchRepository {
     private final NullableBooleanExpression<List<Integer>> integers = new NullableBooleanExpression<>();
     private final NullableBooleanExpression<Date> date = new NullableBooleanExpression<>();
 
+    private final QFlight flight = QFlight.flight;
+
     @Override
     public List<Flight> searchFlights(SearchDto searchParams) {
         final JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        final QFlight flight = QFlight.flight;
         BooleanBuilder builder = new BooleanBuilder();
         return queryFactory.selectFrom(flight)
                 .where(builder
@@ -41,5 +43,11 @@ public class FlightSearchRepositoryImpl implements FlightSearchRepository {
                         .and(integers.find(flight.numberOfTransfers::in, searchParams.getNumbersOfTransfers()))
                         .and(strings.find(flight.flightId::in, searchParams.getFlightIds())))
                 .fetch();
+    }
+
+    @Override
+    public boolean existsByFlightId(String flightId) {
+        final JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        return !queryFactory.selectFrom(flight).where(flight.flightId.eq(flightId)).fetch().isEmpty();
     }
 }

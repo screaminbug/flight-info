@@ -6,9 +6,7 @@ import hr.tstrelar.backend.exception.FlightNotFoundException;
 import hr.tstrelar.backend.mapper.FlightMapper;
 import hr.tstrelar.backend.repository.CompanyRepository;
 import hr.tstrelar.backend.repository.FlightRepository;
-import hr.tstrelar.flight.model.FlightDto;
-import hr.tstrelar.flight.model.RequestMessage;
-import hr.tstrelar.flight.model.ResponseMessage;
+import hr.tstrelar.flight.model.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -45,7 +43,14 @@ public class Consumer {
     public ResponseMessage persistFlightData(final Message<RequestMessage> message) {
         RequestMessage requestMessage = message.getPayload();
         FlightDto flightDto = requestMessage.getFlightDto();
-        //TODO: Implement flight id and return error if that id already exists
+        if (flightDto == null) {
+            return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(BAD_REQUEST));
+        }
+
+        if (flightRepository.existsByFlightId(flightDto.getFlightId())) {
+            return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(ALREADY_EXISTS));
+        }
+
         Company company = getOrCreateCompany(flightDto.getCompany());
         Flight flight = flightMapper.flightDtoToFlight(flightDto);
         flight.setCompany(company);
@@ -67,9 +72,9 @@ public class Consumer {
         ResponseMessage responseMessage;
         try {
             UUID messageId = message.getPayload().getMessageId();
-
             Flight existingFlight = flightRepository.findById(messageId).orElseThrow(
                     () -> new FlightNotFoundException(messageId));
+
             FlightDto newFlightDto = message.getPayload().getFlightDto();
 
             if (newFlightDto.getCompany() != null) {
@@ -95,7 +100,12 @@ public class Consumer {
     @JmsListener(destination = "flight.queue.search.request")
     public ResponseMessage searchFlights(final Message<RequestMessage> message) {
         RequestMessage requestMessage = message.getPayload();
-        List<Flight> flights = flightRepository.searchFlights(requestMessage.getSearchDto());
+        SearchDto searchDto = requestMessage.getSearchDto();
+
+        if (searchDto == null) {
+            return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(BAD_REQUEST));
+        }
+        List<Flight> flights = flightRepository.searchFlights(searchDto);
 
         return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(OK), flightMapper.flightsToFlightDtos(flights));
     }
