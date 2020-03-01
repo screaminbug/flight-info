@@ -184,7 +184,7 @@ Retrieve resource returned by 202 'accepted' response. This can be a result of a
 | statusMessage | string | More info about the status | No |
 
 
-##Messaging
+## Messaging
 Frontend and Backend communicate via ActiveMQ Artemis.
 Adjust following properties in ```application.properties``` of Frontend and Backend modules
 as needed:
@@ -193,9 +193,9 @@ as needed:
 - ```spring.artemis.user```
 - ```spring.artemis.password```
 
-##Authentication and Authorization
+## Authentication and Authorization
 
-###Keycloak
+### Keycloak
 Frontend uses OAuth2 for authentication and authorization. The application is setup to use Keycloak 
 specifically. You can get it [here](https://www.keycloak.org/downloads.html). To use it a keycloak user
 must be created by running ```add-user-keycloak``` script in bin directory.
@@ -213,7 +213,7 @@ to them.
 
 Next, a secret must be regenerated in ```flight-info``` client for use when requesting token.
 
-###Application properties
+### Application properties
 
 The following application properties needs to be set for authorization with Keycloak
 
