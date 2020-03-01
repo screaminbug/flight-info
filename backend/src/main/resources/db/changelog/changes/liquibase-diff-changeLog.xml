@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="Tomislav (generated)" id="1582850951713-1">
+        <createTable tableName="FLIGHTINFO_COMPANIES">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="FLIGHTINFO_COMPANIESPK"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Tomislav (generated)" id="1582850951713-2">
+        <createTable tableName="FLIGHTINFO_FLIGHTS">
+            <column name="id" type="BLOB(16)">
+<!--                <constraints primaryKey="true" primaryKeyName="FLIGHTINFO_FLIGHTSSPK"/>-->
+            </column>
+            <column name="ARRIVAL_AIRPORT" type="VARCHAR(5)"/>
+            <column name="DATE_DEPARTURE" type="datetime"/>
+            <column name="DEPARTURE_AIRPORT" type="VARCHAR(5)"/>
+            <column name="FLIGHT_ID" type="INT"/>
+            <column name="NUMBER_OF_PASSENGERS" type="INT"/>
+            <column name="NUMBER_OF_TRANSFERS" type="INT"/>
+            <column name="COMPANY_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+<!--    <changeSet author="Tomislav (generated)" id="1582850951713-3">-->
+<!--        <addPrimaryKey columnNames="id" constraintName="FLIGHTINFO_FLIGHTSPK" tableName="FLIGHTINFO_FLIGHTS"/>-->
+<!--    </changeSet>-->
+    <changeSet id="manual-1" author="Tomislav">
+        <addUniqueConstraint columnNames="id(16)" constraintName="id" deferrable="false" disabled="false"
+                             initiallyDeferred="false" tableName="FLIGHTINFO_FLIGHTS"/>
+    </changeSet>
+    <changeSet author="Tomislav (generated)" id="1582850951713-4">
+        <addForeignKeyConstraint baseColumnNames="COMPANY_ID" baseTableName="FLIGHTINFO_FLIGHTS"
+                                 constraintName="FK_s2my7xm3frd94yvigvy5xu96k" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="FLIGHTINFO_COMPANIES"/>
+    </changeSet>
+    <changeSet author="Tomislav (generated)" id="1582978261885-1">
+        <addForeignKeyConstraint baseColumnNames="COMPANY_ID" baseTableName="FLIGHTINFO_FLIGHTS" constraintName="FK_s2my7xm3frd94yvigvy5xu96k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="FLIGHTINFO_COMPANIES"/>
+    </changeSet>
+</databaseChangeLog>

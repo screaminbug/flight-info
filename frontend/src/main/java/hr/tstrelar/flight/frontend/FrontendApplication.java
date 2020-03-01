@@ -1,4 +1,4 @@
-package hr.tstrelar.frontend;
+package hr.tstrelar.flight.frontend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
