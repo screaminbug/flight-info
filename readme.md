@@ -1,12 +1,8 @@
 # Flights Info
 Api which stores, updates and retrieves simple flight information data
-[http://tomislav-strelar.from.hr](http://tomislav-strelar.from.hr)
 
 
 ## Version: 1.0.0
-
-### Terms of service
-N/A
 
 **Contact information:**  
 tstrelar@gmail.com  
