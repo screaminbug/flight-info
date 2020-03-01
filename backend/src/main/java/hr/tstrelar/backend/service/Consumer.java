@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static hr.tstrelar.flight.model.Status.aStatusOf;
 import static hr.tstrelar.flight.model.StatusCode.*;
+import static java.util.Optional.*;
 
 @Component
 @Log4j2
@@ -75,13 +76,13 @@ public class Consumer {
                 Company company = getOrCreateCompany(newFlightDto.getCompany());
                 existingFlight.setCompany(company);
             }
-            Optional.ofNullable(newFlightDto.getAirportArrival()).ifPresent(existingFlight::setAirportArrival);
-            Optional.ofNullable(newFlightDto.getAirportDeparture()).ifPresent(existingFlight::setAirportDeparture);
-            Optional.ofNullable(newFlightDto.getDateDeparture()).ifPresent(existingFlight::setDateDeparture);
-            Optional.ofNullable(newFlightDto.getDateArrival()).ifPresent(existingFlight::setDateArrival);
-            Optional.ofNullable(newFlightDto.getFlightId()).ifPresent(existingFlight::setFlightId);
-            Optional.ofNullable(newFlightDto.getNumberOfPassengers()).ifPresent(existingFlight::setNumberOfPassengers);
-            Optional.ofNullable(newFlightDto.getNumberOfTransfers()).ifPresent(existingFlight::setNumberOfTransfers);
+            ofNullable(newFlightDto.getAirportArrival()).ifPresent(existingFlight::setAirportArrival);
+            ofNullable(newFlightDto.getAirportDeparture()).ifPresent(existingFlight::setAirportDeparture);
+            ofNullable(newFlightDto.getDateDeparture()).ifPresent(existingFlight::setDateDeparture);
+            ofNullable(newFlightDto.getDateArrival()).ifPresent(existingFlight::setDateArrival);
+            ofNullable(newFlightDto.getFlightId()).ifPresent(existingFlight::setFlightId);
+            ofNullable(newFlightDto.getNumberOfPassengers()).ifPresent(existingFlight::setNumberOfPassengers);
+            ofNullable(newFlightDto.getNumberOfTransfers()).ifPresent(existingFlight::setNumberOfTransfers);
 
             flightRepository.save(existingFlight);
             responseMessage = new ResponseMessage(messageId, aStatusOf(OK), flightMapper.flightToFlightDto(existingFlight));

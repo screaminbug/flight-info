@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -31,6 +32,7 @@ public class FlightController  {
     }
 
     @PostMapping(path = "flight", produces = "application/json", consumes = "application/json")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public DeferredResult<ResponseEntity<ResponseMessage>> addFlight(
             @RequestBody FlightDto flightDto) {
         // TODO: validate request
@@ -41,6 +43,7 @@ public class FlightController  {
     }
 
     @PostMapping(path = "flight/{id}", produces = "application/json", consumes = "application/json")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public DeferredResult<ResponseEntity<ResponseMessage>> updateFlight(
             @RequestBody FlightDto body,
             @PathVariable String id) {
@@ -52,6 +55,7 @@ public class FlightController  {
     }
 
     @GetMapping(path = "flight/find", produces = "application/json")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     public DeferredResult<ResponseEntity<ResponseMessage>> findFlight(
             @RequestParam("date-dpt-from") @Nullable Date dateDepartureFrom,
             @RequestParam("date-dpt-to") @Nullable Date dateDepartureTo,
@@ -59,8 +63,8 @@ public class FlightController  {
             @RequestParam("date-arr-to") @Nullable Date dateArrivalTo,
             @RequestParam("departure-iata") @Nullable List<String> departureAirports,
             @RequestParam("arrival-iata") @Nullable List<String> arrivalAirports,
-            @RequestParam("passanger-count") @Nullable List<Integer> numberOfPassengers,
-            @RequestParam("trasfers-count") @Nullable List<Integer> transfers,
+            @RequestParam("passenger-count") @Nullable List<Integer> numberOfPassengers,
+            @RequestParam("transfer-count") @Nullable List<Integer> transfers,
             @RequestParam("company") @Nullable List<String> companies,
             @RequestParam("flight-id") @Nullable List<String> flightIds) {
         // TODO: add validation
@@ -85,6 +89,7 @@ public class FlightController  {
     }
 
     @GetMapping(value = "resource/{id}", produces = "application/json")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     public DeferredResult<ResponseEntity<ResponseMessage>> getResultByMessageId(
             @PathVariable("id") String messageId) {
         return DeferredFlightServiceResult.Builder
