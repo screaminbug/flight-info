@@ -10,7 +10,7 @@
     </parent>
     <groupId>hr.tstrelar</groupId>
     <artifactId>frontend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>frontend</name>
     <description>Microservice for exposing flight data as RESTful service</description>
 
