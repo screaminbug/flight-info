@@ -183,6 +183,8 @@ Retrieve resource returned by 202 'accepted' response. This can be a result of a
 | statusCode | string | The status code of the processing result | No |
 | statusMessage | string | More info about the status | No |
 
+## Database
+Database used is MySQL. The script for creating the schema is in ```external/create_db_and_schema.sql```
 
 ## Messaging
 Frontend and Backend communicate via ActiveMQ Artemis.
