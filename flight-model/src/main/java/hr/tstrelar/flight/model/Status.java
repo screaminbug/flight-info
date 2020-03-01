@@ -11,8 +11,8 @@ public class Status implements Serializable {
     private final String statusMessage;
 
     private Status(StatusCode statusCode) {
-        this.statusCode = statusCode.getMessage();
-        statusMessage = statusCode.getCode();
+        this.statusCode = statusCode.getCode();
+        statusMessage = statusCode.getMessage();
     }
 
     public static Status aStatusOf(StatusCode statusCode) {

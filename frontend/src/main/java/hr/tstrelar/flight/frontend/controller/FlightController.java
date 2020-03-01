@@ -7,10 +7,12 @@ import hr.tstrelar.flight.model.ResponseMessage;
 import hr.tstrelar.flight.model.SearchDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.Date;
@@ -35,7 +37,7 @@ public class FlightController  {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public DeferredResult<ResponseEntity<ResponseMessage>> addFlight(
             @RequestBody FlightDto flightDto) {
-        // TODO: validate request
+        validate(flightDto);
         return DeferredFlightServiceResult.Builder.create()
                 .withTimeout(timeout + 100)
                 .withRequest(flightDto).build()
@@ -45,11 +47,12 @@ public class FlightController  {
     @PostMapping(path = "flight/{id}", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public DeferredResult<ResponseEntity<ResponseMessage>> updateFlight(
-            @RequestBody FlightDto body,
+            @RequestBody FlightDto flightDto,
             @PathVariable String id) {
+        validate(flightDto, id);
         return DeferredFlightServiceResult.Builder.create()
                 .withTimeout(timeout + 100)
-                .withRequest(body, UUID.fromString(id))
+                .withRequest(flightDto, UUID.fromString(id))
                 .build()
                 .callWith(jmsFlightService::updateFlightData);
     }
@@ -57,17 +60,36 @@ public class FlightController  {
     @GetMapping(path = "flight/find", produces = "application/json")
     @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     public DeferredResult<ResponseEntity<ResponseMessage>> findFlight(
-            @RequestParam("date-dpt-from") @Nullable Date dateDepartureFrom,
-            @RequestParam("date-dpt-to") @Nullable Date dateDepartureTo,
-            @RequestParam("date-arr-from") @Nullable Date dateArrivalFrom,
-            @RequestParam("date-arr-to") @Nullable Date dateArrivalTo,
-            @RequestParam("departure-iata") @Nullable List<String> departureAirports,
-            @RequestParam("arrival-iata") @Nullable List<String> arrivalAirports,
-            @RequestParam("passenger-count") @Nullable List<Integer> numberOfPassengers,
-            @RequestParam("transfer-count") @Nullable List<Integer> transfers,
-            @RequestParam("company") @Nullable List<String> companies,
-            @RequestParam("flight-id") @Nullable List<String> flightIds) {
-        // TODO: add validation
+            @RequestParam("date-dpt-from")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    Date dateDepartureFrom,
+            @RequestParam("date-dpt-to")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    Date dateDepartureTo,
+            @RequestParam("date-arr-from")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    Date dateArrivalFrom,
+            @RequestParam("date-arr-to")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    Date dateArrivalTo,
+            @RequestParam("departure-iata")
+            @Nullable
+                    List<String> departureAirports,
+            @RequestParam("arrival-iata")
+            @Nullable
+                    List<String> arrivalAirports,
+            @RequestParam("passenger-count")
+            @Nullable
+                    List<Integer> numberOfPassengers,
+            @RequestParam("transfer-count")
+            @Nullable
+                    List<Integer> transfers,
+            @RequestParam("company")
+            @Nullable
+                    List<String> companies,
+            @RequestParam("flight-id")
+            @Nullable
+                    List<String> flightIds) {
         SearchDto searchDto = new SearchDto(
                 dateDepartureFrom,
                 dateDepartureTo,
@@ -97,5 +119,23 @@ public class FlightController  {
                 .withTimeout(timeout+100)
                 .withRequest(UUID.fromString(messageId))
                 .build().callWith(jmsFlightService::getPreviousResponseOrFlight);
+    }
+
+    private void validate(FlightDto flightDto) {
+        if (
+                flightDto.getCompany() == null
+                || flightDto.getAirportArrival() == null
+                || flightDto.getAirportDeparture() == null
+                || flightDto.getDateArrival() == null
+                || flightDto.getDateDeparture() == null
+                || flightDto.getFlightId() == null
+                || flightDto.getNumberOfPassengers() == null
+                || flightDto.getNumberOfTransfers() == null
+        ) { throw new IllegalArgumentException(); }
+    }
+
+    private void validate(FlightDto flightDto, String id) {
+        validate(flightDto);
+        if (id == null) { throw new IllegalArgumentException(); }
     }
 }
