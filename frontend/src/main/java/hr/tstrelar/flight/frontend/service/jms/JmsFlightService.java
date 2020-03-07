@@ -58,7 +58,8 @@ public class JmsFlightService implements FlightService {
     }
 
     @Override
-    public ResponseMessage getPreviousResponseOrFlight(RequestMessage message) {
+    public ResponseMessage getPreviousResponse(RequestMessage message) {
+        log.info("Checking the queues...");
         checkMessageIdExists(message, "get flight");
 
         // see if we have a message waiting for us in any of the queues
@@ -96,13 +97,17 @@ public class JmsFlightService implements FlightService {
             Message previousResult = jmsTemplate.receiveSelected(
                     queue + RESPONSE_SUFFIX,
                     CorrelationSelector.select(messageId.toString()));
-            if (previousResult != null) { return Optional.ofNullable(previousResult.getBody(ResponseMessage.class)); }
+            if (previousResult != null) {
+                log.info("The message with id '{}' has been found in queue '{}'", messageId.toString(), queue);
+                return Optional.ofNullable(previousResult.getBody(ResponseMessage.class));
+            }
         } catch (JMSException e) {
             log.error("An exception occurred while checking queue '{}' for message ID '{}', exception was: {}",
                     queue,
                     messageId,
                     e);
         }
+        log.info("There was no message with id '{}' in queue '{}'", messageId.toString(), queue);
         return Optional.empty();
     }
 
@@ -114,18 +119,21 @@ public class JmsFlightService implements FlightService {
     }
 
     private ResponseMessage push(RequestMessage requestMessage, String queue) {
+        log.info("Pushing the message with id '{}' to queue '{}'", requestMessage.getMessageId().toString(), queue);
         UUID messageId = requestMessage.getMessageId();
         try {
             syncRequestor.setTimeout(timeout);
             syncRequestor.setCorrelationId(messageId.toString());
             Message message = syncRequestor.requestAndWait(requestMessage, queue);
             if (message != null) {
+                log.info("Got the message synchronously. Returning immediately.");
                 return message.getBody(ResponseMessage.class);
             } else {
                 // We don't want to wait forever. If the message is null,
                 // it means that the set timeout has been reached.
                 // Let backend handle it. The client will get a handle (uuid) which they
                 // can use to check if it's done.
+                log.info("Can't be bothered to wait any longer. Just returning 'Accepted'.");
                 return new ResponseMessage(messageId, aStatusOf(ACCEPTED));
             }
         } catch (JMSException e) {

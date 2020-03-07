@@ -1,6 +1,8 @@
 package hr.tstrelar.flight.frontend.helpers;
 
+import com.sun.jndi.url.corbaname.corbanameURLContextFactory;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
@@ -15,6 +17,7 @@ import static hr.tstrelar.flight.frontend.helpers.Constants.*;
 
 
 @Component
+@Log4j2
 public class SyncRequestor<T extends Serializable> {
     private final JmsTemplate jmsTemplate;
     @Setter
@@ -70,14 +73,18 @@ public class SyncRequestor<T extends Serializable> {
                                 destination + RESPONSE_SUFFIX,
                                 false);
 
+                log.info("Creating consumer for destination '{}' and correlation id '{}", replyDestination, correlationId);
                 consumer = session.createConsumer(replyDestination, CorrelationSelector.select(correlationId));
 
                 final ObjectMessage objectMessage = session.createObjectMessage(msg);
                 objectMessage.setJMSCorrelationID(correlationId);
                 objectMessage.setJMSReplyTo(replyDestination);
 
+                log.info("Creating producer for destination '{}'", requestDestination);
                 producer = session.createProducer(requestDestination);
+                log.info("Sending message...      Correlation ID is '{}'", correlationId);
                 producer.send(objectMessage);
+                log.info("Waiting for response... Correlation ID is '{}'", correlationId);
                 return consumer.receive(timeout); // blocking!
 
             } finally {

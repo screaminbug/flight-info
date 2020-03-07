@@ -4,6 +4,7 @@ import hr.tstrelar.flight.model.FlightDto;
 import hr.tstrelar.flight.model.RequestMessage;
 import hr.tstrelar.flight.model.ResponseMessage;
 import hr.tstrelar.flight.model.SearchDto;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
 
+@Log4j2
 public final class DeferredFlightServiceResult
         extends DeferredResult<ResponseEntity<ResponseMessage>> {
 
@@ -25,6 +27,7 @@ public final class DeferredFlightServiceResult
     }
 
     public DeferredResult<ResponseEntity<ResponseMessage>> callWith(Function<RequestMessage, ResponseMessage> serviceCall) {
+        log.info("Submitting request: {}", request);
         ForkJoinPool.commonPool().submit(
             () -> setResult(ResponseEntity.ok(serviceCall.apply(request)))
         );

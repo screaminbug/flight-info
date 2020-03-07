@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.Date;
@@ -118,7 +117,7 @@ public class FlightController  {
                 .create()
                 .withTimeout(timeout+timeout)
                 .withRequest(UUID.fromString(messageId))
-                .build().callWith(jmsFlightService::getPreviousResponseOrFlight);
+                .build().callWith(jmsFlightService::getPreviousResponse);
     }
 
     private void validate(FlightDto flightDto) {

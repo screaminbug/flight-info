@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface FlightService {
     ResponseMessage persistFlightData(RequestMessage message);
-    ResponseMessage getPreviousResponseOrFlight(RequestMessage message);
+    ResponseMessage getPreviousResponse(RequestMessage message);
     ResponseMessage updateFlightData(RequestMessage message);
     ResponseMessage searchFlights(RequestMessage message);
 }
