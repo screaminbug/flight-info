@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequestMapping(path = "v1")
 public class FlightController  {
 
-    @Value("${jms.sync.timeout}")
+    @Value("${deferred.timeout}")
     private Long timeout;
 
     private final FlightService jmsFlightService;
@@ -38,7 +38,7 @@ public class FlightController  {
             @RequestBody FlightDto flightDto) {
         validate(flightDto);
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + timeout)
+                .withTimeout(timeout)
                 .withRequest(flightDto).build()
                 .callWith(jmsFlightService::persistFlightData);
     }
@@ -50,7 +50,7 @@ public class FlightController  {
             @PathVariable String id) {
         validate(flightDto, id);
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + timeout)
+                .withTimeout(timeout)
                 .withRequest(flightDto, UUID.fromString(id))
                 .build()
                 .callWith(jmsFlightService::updateFlightData);
@@ -103,7 +103,7 @@ public class FlightController  {
         );
 
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + timeout)
+                .withTimeout(timeout)
                 .withRequest(searchDto)
                 .build()
                 .callWith(jmsFlightService::searchFlights);
@@ -115,7 +115,7 @@ public class FlightController  {
             @PathVariable("id") String messageId) {
         return DeferredFlightServiceResult.Builder
                 .create()
-                .withTimeout(timeout+timeout)
+                .withTimeout(timeout)
                 .withRequest(UUID.fromString(messageId))
                 .build().callWith(jmsFlightService::getPreviousResponse);
     }

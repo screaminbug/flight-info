@@ -59,6 +59,7 @@ public class SyncRequestor<T extends Serializable> {
         public Message doInJms(final Session session) throws JMSException {
             MessageConsumer consumer = null;
             MessageProducer producer = null;
+            Message response = null;
             try {
                 final Destination requestDestination =
                         destinationResolver.resolveDestinationName(
@@ -84,12 +85,14 @@ public class SyncRequestor<T extends Serializable> {
                 log.info("Sending message...      Correlation ID is '{}'", correlationId);
                 producer.send(objectMessage);
                 log.info("Waiting for response... Correlation ID is '{}'", correlationId);
-                return consumer.receive(timeout); // blocking!
-
+                response = consumer.receive(timeout); // blocking!
+            } catch (Exception e) {
+                log.error("Something went terribly wrong with JMS.", e);
             } finally {
                 if (consumer != null) { JmsUtils.closeMessageConsumer(consumer); }
                 if (producer != null) { JmsUtils.closeMessageProducer(producer); }
             }
+            return response;
         }
     }
 }
