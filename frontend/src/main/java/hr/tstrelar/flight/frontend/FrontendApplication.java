@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class FrontendApplication {
 
     public static void main(String[] args) {
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "16");
         SpringApplication.run(FrontendApplication.class, args);
     }
 
