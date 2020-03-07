@@ -65,8 +65,8 @@ public class JmsFlightService implements FlightService {
         ResponseMessage previousResult = checkQueues(message.getMessageId());
         if (previousResult != null) { return previousResult; }
 
-        // if not, push the new request to the queue
-        return push(message, requestGetQueue);
+        // if not, return not found
+        return new ResponseMessage(message.getMessageId(), aStatusOf(NOT_FOUND));
     }
 
     @Override

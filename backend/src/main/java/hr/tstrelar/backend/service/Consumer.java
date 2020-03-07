@@ -59,14 +59,6 @@ public class Consumer {
         return new ResponseMessage(requestMessage.getMessageId(), aStatusOf(SAVED), flightMapper.flightToFlightDto(flight));
     }
 
-    @JmsListener(destination = "flight.queue.get.request")
-    public ResponseMessage getFlightById(final Message<RequestMessage> message) {
-        UUID messageId = message.getPayload().getMessageId();
-        return flightRepository.findById(messageId)
-                .map($ -> new ResponseMessage(messageId, aStatusOf(OK), flightMapper.flightToFlightDto($)))
-                .orElse(new ResponseMessage(messageId, aStatusOf(NOT_FOUND)));
-    }
-
     @JmsListener(destination = "flight.queue.update.request")
     public ResponseMessage updateFlight(final Message<RequestMessage> message) {
         ResponseMessage responseMessage;
