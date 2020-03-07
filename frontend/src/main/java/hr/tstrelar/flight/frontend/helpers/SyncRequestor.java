@@ -1,6 +1,5 @@
 package hr.tstrelar.flight.frontend.helpers;
 
-import com.sun.jndi.url.corbaname.corbanameURLContextFactory;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
