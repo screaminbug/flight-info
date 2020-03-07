@@ -81,7 +81,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.example</groupId>
+            <groupId>hr.tstrelar</groupId>
             <artifactId>flight-model</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
