@@ -39,7 +39,7 @@ public class FlightController  {
             @RequestBody FlightDto flightDto) {
         validate(flightDto);
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + 100)
+                .withTimeout(timeout + timeout)
                 .withRequest(flightDto).build()
                 .callWith(jmsFlightService::persistFlightData);
     }
@@ -51,7 +51,7 @@ public class FlightController  {
             @PathVariable String id) {
         validate(flightDto, id);
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + 100)
+                .withTimeout(timeout + timeout)
                 .withRequest(flightDto, UUID.fromString(id))
                 .build()
                 .callWith(jmsFlightService::updateFlightData);
@@ -104,7 +104,7 @@ public class FlightController  {
         );
 
         return DeferredFlightServiceResult.Builder.create()
-                .withTimeout(timeout + 100)
+                .withTimeout(timeout + timeout)
                 .withRequest(searchDto)
                 .build()
                 .callWith(jmsFlightService::searchFlights);
@@ -116,7 +116,7 @@ public class FlightController  {
             @PathVariable("id") String messageId) {
         return DeferredFlightServiceResult.Builder
                 .create()
-                .withTimeout(timeout+100)
+                .withTimeout(timeout+timeout)
                 .withRequest(UUID.fromString(messageId))
                 .build().callWith(jmsFlightService::getPreviousResponseOrFlight);
     }
